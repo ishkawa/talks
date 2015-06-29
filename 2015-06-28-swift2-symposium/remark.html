@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Title</title>
+    <meta charset="utf-8">
+    <style>
+      @import url(https://fonts.googleapis.com/css?family=Ubuntu+Mono:400,700,400italic);
+      @import url(https://fonts.googleapis.com/earlyaccess/notosansjapanese.css);
+
+      body { 
+        font-family: 'HelveticaNeue-Light';
+      }
+      h1, h2, h3 {
+        font-family: 'Noto Sans Japanese';
+        font-weight: 100;
+        letter-spacing: -2px;
+      }
+      .remark-slide-content {
+        background-color: #242424;
+        font-size: 24px;
+        color: #ffffff;
+      }
+      .remark-code, .remark-inline-code {
+        font-family: 'Menlo';
+      }
+      code {
+        border-radius: 3px;
+      }
+    </style>
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle
+
+# Protocol Extension
+
+### ishkawa
+
+---
+
+background-image: url(./profile.png)
+
+---
+
+# Protocol Extension
+
+```swift
+protocol MyProtocol {
+    var name: String { get }
+    func doSomething()
+}
+```
+
+```swift
+extension MyProtocol {
+    var name: String {
+        return "ishkawa"
+    }
+
+    func doSomething() {
+    }
+}
+```
+
+---
+
+class: center, middle
+# Swift 1のprotocol
+
+---
+
+# Swift 1のprotocol
+
+- インターフェースを定義
+
+```swift
+protocol DataSource {
+    func numberOfSections() -> Int
+    func numberOfItemsInSection(section: Int) -> Int
+}
+```
+
+---
+
+# Swift 1のprotocol
+
+- 適合する型で実装
+
+```swift
+class ViewController: UIViewController, DataSource {
+    func numberOfSections() -> Int {
+        return 1
+    }
+
+    func numberOfItemsInSection(section: Int) -> Int {
+        return 1
+    }
+}
+```
+
+---
+
+# Swift 1のprotocol
+
+- `@objc`なら`optional`を定義できる
+
+```swift
+@objc protocol DataSource {
+    optional func numberOfSections() -> Int
+    func numberOfItemsInSection(section: Int) -> Int
+}
+```
+
+---
+
+# Swift 1のprotocol
+
+- `optional`は実装しなくても良い
+
+```swift
+class ViewController: UIViewController, DataSource {
+    func numberOfItemsInSection(section: Int) -> Int {
+        return 1
+    }
+}
+```
+
+---
+
+# Swift 1のprotocol
+
+- `numberOfSections()`の実装の有無は呼び出し側でハンドル
+- デフォルトの動作は利用側が用意する
+
+```swift
+let dataSource: DataSource
+let numberOfSections = dataSource.numberOfSections?() ?? 1
+```
+
+---
+
+class: center, middle
+# Swift 2のprotocol
+
+---
+
+# Swift 2のprotocol
+
+- インターフェースを定義
+
+```swift
+protocol DataSource {
+    func numberOfSections() -> Int
+    func numberOfItemsInSection(section: Int) -> Int
+}
+```
+
+- `extension`でデフォルトの実装を定義
+
+```swift
+protocol DataSource {
+    func numberOfSections() -> Int {
+        return 1
+    }
+}
+```
+
+---
+
+# Swift 2のprotocol
+
+- protocol extensionで実装されているものは実装しなくても良い
+
+```swift
+class ViewController: UIViewController, DataSource {
+    func numberOfItemsInSection(section: Int) -> Int {
+        return 1
+    }
+}
+```
+
+---
+
+# Swift 2のprotocol
+
+- デフォルトの動作はprotocol extensionが用意している
+- 利用側は適合している型が実装しているか気にする必要はない
+
+
+```swift
+let dataSource: DataSource
+let numberOfSections = dataSource.numberOfSections()
+```
+
+---
+
+# Swift 2のprotocol
+
+- protocolにデフォルト実装を定義できるようになった
+
+### デフォルト実装による設計の変化
+
+- `@objc`にしなくても`optional`(のようなもの)を提供できる
+- デフォルトの動作の定義を利用側からprotocol側に移せる
+  ```swift
+  // optionalの場合(Swift 1, 2)
+  let numberOfSections = dataSource.numberOfSections?() ?? 1
+
+  // protocol extensionの場合(Swift 2)
+  let numberOfSections = dataSource.numberOfSections
+  ```
+
+---
+
+class: center, middle
+# Swift標準ライブラリの変化
+
+---
+
+class: center, middle
+# Swift 1のmap
+
+---
+
+# Swift 1のmap
+
+- 定義
+
+```swift
+func map<C: CollectionType, T>
+  (source: C, transform: (C.Generator.Element) -> T) -> [T]
+```
+
+- 利用例
+
+```swift
+let names = ["foo", "bar", "baz"]
+let counts = map(names) { name in
+    count(name)
+}
+```
+
+- 汎用的だがグローバル関数はコード補完から探すのが面倒
+
+---
+
+# Swift 1のmap
+
+- 型ごとにメソッドとしても定義されている
+
+```swift
+extension Array {
+    func map<U>(transform: (T) -> U) -> [U]
+}
+```
+
+- 利用例
+
+```swift
+let names = ["foo", "bar", "baz"]
+let counts = names.map { name in
+    count(name)
+}
+```
+
+- 型ごとに定義...
+
+---
+
+class: center, middle
+# Swift 2のmap
+
+### グローバル関数 → protocol extension
+
+---
+
+# Swift 2のmap
+
+- 定義
+
+```swift
+extension CollectionType {
+    func map<T>
+      (@noescape transform: (Self.Generator.Element) -> T) -> [T]
+}
+```
+
+- 利用例
+
+```swift
+let counts: [Int] = names.map { name in
+    name.characters.count
+}
+```
+
+- 型ごとに定義しなくてもメソッドとして利用できる
+
+---
+
+# mapはどう変わったか
+
+- 達成したい条件
+  - `CollectionType`に対して適用できるようにしたい
+  - メソッドとして提供したい
+
+- Swift 1
+  - グローバル関数で`CollectionType`への適用を提供
+  - `Array`など型ごとにメソッドを提供
+
+- Swift 2
+  - `CollectionType`のprotocol extensionでメソッドを提供
+
+---
+
+class: center, middle
+# 型制約つきprotocol extension
+
+---
+
+# 型制約つきグローバル関数
+
+- 特定の条件を満たす型だけに実行できる関数もある
+
+```swift
+// Swift 1
+func sorted<C: SequenceType where C.Generator.Element: Comparable>
+  (source: C) -> [C.Generator.Element]
+```
+
+SequenceTypeに適合している型Cのうち、要素となるC.Generator.ElementがComparableに適合していれば`sorted()`を実行できる。
+
+---
+
+# 型制約つきprotocol extension
+
+- 条件を満たす型のみprotocol extensionを定義することもできる
+
+```swift
+extension SequenceType where Self.Generator.Element : Comparable {
+    func sort() -> [Self.Generator.Element]
+}
+```
+
+---
+
+class: center, middle
+# Protocol Oriented Programming
+
+WWDC 2015の"Protocol Oriented Programming in Swift"  
+というトークから理解したことをまとめます。
+
+---
+
+# 3行で
+
+- classにはいくつか問題がある
+- protocol + structで解決できる
+- なるべくprotocol + structを使おう
+
+---
+
+# 抽象クラスの継承の問題
+
+- 何をoverrideすればいいのかわからない
+- ドキュメント以外から知ることは難しい
+
+```swift
+// 抽象クラス
+class Ordered {
+    func precedes(other: Ordered) -> Bool {
+        fatalError("implement me!")
+    }
+}
+```
+
+overrideが必要なものの抽象クラス側での実装を、`fatalError`にしておけばサブクラスでの実装が必要であることを知らせることはできる。
+
+- エラーはコンパイル時に知りたいが`fatalError()`は実行時
+
+---
+
+# 抽象クラスの継承の問題
+
+- protocolでは実装すべきものが明らか
+
+```swift
+// 抽象クラスをprotocolに置き換え
+protocol Ordered {
+    func precedes(other: Ordered) -> Bool
+}
+```
+
+- 実装漏れはコンパイル時に知ることができる
+- デフォルト実装はprotocol extensionで定義できる
+
+---
+
+# 抽象化による型の損失
+
+```swift
+class Ordered {
+    func precedes(other: Ordered) -> Bool {
+        fatalError()
+    }
+}
+
+class Number: Ordered {
+    override func precedes(other: Ordered) -> Bool {
+        let otherNumber = other as! Number
+        ...
+    }
+}
+```
+
+- overrideしたメソッドの型は変更できない
+- Numberのprecedes()に他のサブクラスが入る可能性もある
+- つまり、抽象的なコードを型安全に書けない
+
+---
+
+# 抽象化による型の損失
+
+```swift
+protocol Ordered {
+    func precedes(other: Self) -> Bool
+}
+
+struct Number: Ordered {
+    func precedes(other: Number) -> Bool {
+        ...
+    }
+}
+```
+
+- protocolではSelfが利用できる
+- precedes()の引数にはNumber以外の型は入らない
+
+---
+
+### 抽象的かつ型安全なコードの他の例
+
+```swift
+public protocol Request {
+    typealias Response
+    func execute(Response -> Void)
+}
+
+struct GetRepositoryRequest: Request {
+    typealias Response = Repository
+}
+
+struct GetUserRequest: Request {
+    typealias Response = User
+}
+
+let repositoryRequest = GetRepositoryRequest()
+repositoryRequest.execute { response in
+    // responseはRepository
+}
+
+let userRequest = GetUserRequest()
+userRequest.execute { response in
+    // responseはUser
+}
+```
+
+---
+
+# どちらを採用するべきか
+
+どちらもインターフェースと実装の両方を提供し、継承が可能という点では似ているが、抽象的なコードにはプロトコルの方が向いている。
+
+- 抽象クラスは実装の要求が不明確
+- 抽象クラスでは抽象的なコードを型安全に書けない
+
+とはいえ、プロトコルに弱点がないわけでもない
+
+- デフォルト実装(クラスのsuper相当)への参照ができない
+- stored propertyを持つことができない
+
+---
+
+# まとめ
+
+- プロトコルにデフォルト実装が定義できるようになった
+- 標準ライブラリもそれを活かしたつくりに変わってきている
+- 抽象クラスをプロトコルで置き換えるという流れがある
+
+---
+
+    </textarea>
+    <script src="./remark.js">
+    </script>
+    <script>
+        var slideshow = remark.create({
+            highlightStyle: 'solarized_dark'
+        });
+      // var slideshow = remark.create({
+      //   sourceUrl: './src/2015-06-28-swift2-symposium.md'
+      // });
+    </script>
+  </body>
+</html>
