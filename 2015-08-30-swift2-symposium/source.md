@@ -281,6 +281,9 @@ case (let a, let b):
     print("A: \(a), B: \(b)")
 }
 ```
+
+---
+
 class: center, middle
 ### ところで、普通のswitchはどうなってたの？
 
@@ -379,4 +382,4 @@ override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath:
 - パターンの文法は初見では難しいが1度理解すれば簡単
 - 複数のパターンの組み合わせで値の性質を表現する
 - 標準ライブラリでいくつかexpression patternが用意されている
-- アプリ開発でも案外使える
+- アプリ開発でも使いどころはある
