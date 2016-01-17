@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Title</title>
+    <meta charset="utf-8">
+    <style>
+      @import url(https://fonts.googleapis.com/css?family=Ubuntu+Mono:400,700,400italic);
+      @import url(https://fonts.googleapis.com/earlyaccess/notosansjapanese.css);
+
+      body {
+        font-family: 'HelveticaNeue-Light';
+      }
+      h1, h2, h3 {
+        font-family: 'Noto Sans Japanese';
+        font-weight: 300;
+        letter-spacing: -2px;
+      }
+      body {
+        font-family: 'Noto Sans Japanese';
+        font-weight: 100;
+        letter-spacing: -0.5px;
+      }
+      .remark-slide-content {
+        background-color: #242424;
+        font-size: 24px;
+        color: #ffffff;
+      }
+      .remark-code, .remark-inline-code {
+        font-family: 'Menlo';
+      }
+      code {
+        border-radius: 3px;
+      }
+    </style>
+  </head>
+  <body>
+    <script src="./remark.js">
+    </script>
+    <script>
+      var slideshow = remark.create({
+        slideNumberFormat: '',
+        highlightStyle: 'solarized_dark',
+        sourceUrl: 'source.md'
+      });
+    </script>
+  </body>
+</html>
