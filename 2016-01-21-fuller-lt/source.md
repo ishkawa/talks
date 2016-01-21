@@ -1,6 +1,6 @@
 class: center, middle
 
-# Swift
+# Swiftってどうなの？
 
 ### ishkawa
 
@@ -141,13 +141,75 @@ func doSomething() throws {
 
 ## switchの列挙漏れ
 
+```swift
+enum TrafficLight {
+    case Green, Yellow, Red
+}
+```
+
+```swift
+let trafficLight: TrafficLight = ...
+
+// case .Yellowがないのでコンパイルエラー
+switch trafficLight {
+case .Green:
+    print("Green")
+
+case .Red:
+    print("Red")
+}
+```
+
+- ケースが変わった時に変更すべき場所を特定しやすい
+- コンパイルエラーによって実装漏れに気づける
+
 ---
 
 ## 初期化前の変数へのアクセス
 
+```swift
+let shouldStop: Bool
+
+switch trafficLight {
+case .Green:
+    break
+
+case .Yellow, .Red:
+    shouldStop = true
+}
+
+// .Greenの場合shouldStopが初期化されていないのでコンパイルエラー
+if shouldStop {
+
+}
+```
+
+- コンパイラが初期化をチェックしてくれる
+- 変数宣言時に初期化しなくても安心
+- `let`の場合は再代入もコンパイラがチェックしてくれる
+
 ---
 
 ## 戻り値の型の不整合
+
+```swift
+func shouldStop() -> Bool {
+    switch trafficLight {
+    case .Green:
+        return false
+
+    case .Yellow:
+        return true
+
+    case .Red:
+        // このケースで戻り値がBoolじゃないのでコンパイルエラー
+        break
+    }
+}
+```
+
+- 全実行パターンが宣言された型を返すかチェックしてくれる
+- 末尾リターンに拘る必要がない
 
 ---
 class: center, middle
@@ -157,9 +219,9 @@ class: center, middle
 ---
 class: center, middle
 
-# めっちゃ尻に敷かれる
+# Swiftはよく叱ってくれる
 
 ---
 class: center, middle
 
-# 尻に敷かれたい人におすすめ
+# 叱られたい人におすすめ
