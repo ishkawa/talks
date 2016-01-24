@@ -11,7 +11,12 @@ background-image: url(./profile.png)
 ---
 class: center, middle
 
-## Swiftはよく叱ってくれる
+# Swiftってどうなの？
+
+---
+class: center, middle
+
+## Swiftはよく叱ってくれる言語
 
 ---
 
