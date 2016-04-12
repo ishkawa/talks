@@ -1,4 +1,4 @@
-# 大河
+# RxSwift + MVVM
 #### ishkawa
 
 Note:
@@ -12,35 +12,46 @@ Note:
 <img src="./img/profile.png" height="500">
 
 Note:
-- GitHub IDはishkawaです。
+- メルカリで働いているishkawaです。
 - APIKitというネットワーキングライブラリをつくっています。
-- 最近はメルカリで働いています。
 
 
 
-# 概要
+## 近況
 
-1. Rx + ViewModelを前提とした設計
-2. 画面を跨ぐグローバルなイベント
-3. イベントの待ち合わせの活用事例
-
-
-
-## Rx + ViewModelを前提とした設計
+- 新プロジェクトでRxSwiftをハードに使った
+- 試行錯誤で大変だったけど良いところもわかってきた
 
 
 
-### UIはよく変わる
+## RxSwift + MVVMを前提とした設計
+
+
+
+MVVM: レイヤーの切り分けが良い感じ
+
+
+
+### UIは変わりやすい
+
+<img src="./img/tweet1.png" height="500">
+<img src="./img/tweet2.png" height="500">
+
+Note:
+- UIは変わりやすいという性質がある
+- 仕様変更やリニューアル
+- バリエーションが複数あることもある
+
+
+
+### データの操作は変わりにくい
 
 <img src="./img/tweet1.png" height="500">
 <img src="./img/tweet2.png" height="500">
 
-
-
-### 操作は変わりにくい
-
-<img src="./img/tweet1.png" height="500">
-<img src="./img/tweet2.png" height="500">
+Note:
+- UIを通じて行う操作は変わりにくい
+- タップ -> API -> 結果反映
 
 
 
@@ -49,6 +60,14 @@ Note:
 
 
 <img src="./img/MVVM2.png" height="500" style="background:none; border:none; box-shadow:none;">
+
+
+
+RxSwift: データのUIへの反映が自動的
+
+
+
+<img src="./img/MVVM.png" height="500" style="background:none; border:none; box-shadow:none;">
 
 
 
@@ -68,11 +87,10 @@ Note:
 
 - `T`の値が流れてくる川
 - 演算できる (map, filter, zipなど)
-- Observerに接続できる
+- `Observer<T>`に接続できる
 
 
 
-<img src="./img/tweet1.png" height="500">
 <img src="./img/tweet2.png" height="500">
 
 
@@ -85,26 +103,36 @@ Note:
 
 
 
+```swift
+class TweetView: UIView {
+    ...
+
+    func bind() {
+        view.likeButton.rx_tap
+            .bindTo(viewModel.likeTrigger)
+            .addDisposableTo(disposeBag)
+
+        viewModel.liked
+            .bindTo(view.likeButton.rx_selected)
+            .addDisposableTo(disposeBag)
+    }
+}
+```
+
+
+
+
 ### View
 
-- 入出力のストリームを接続するだけ
-- 頻繁に変更されるが実装コストは低い
+- 1度ストリームを繋いでしまえば反映は自動的
+- やることは入出力のストリームを接続するだけ
+- 実装コストは低いので頻繁に変更されてもつらくない
 
 
 
 ### ViewModel
 
-- 状態管理も担当する
-- 実装コストは高いが再利用性が高い
-
-
-
-### 小まとめ
-
-- 変更されやすい箇所と変更されにくいところを分ける
-- 変更されやすい箇所の実装コストを下げる
-- 変更されにくいところの再利用性を高める
-
+- 実装コストは高いが変更されにくい
 
 
 
@@ -112,23 +140,30 @@ Note:
 
 
 
-一覧画面と詳細画面の図
+<img src="./img/tweet1.png" height="500">
+<img src="./img/tweet2.png" height="500">
 
 
 
 - 状態の変更は画面間で共有されてほしい
-- 画面間で共有されるということはグローバル
+- グローバルなものはグローバルなもので表そう
 
 
-
-これでやってみるか...
 
 ```swift
 final class GlobalObservables {
-    // Itemはvalue typeの方が望ましい
     static let likedItem = PublishSubject<Item>()
 }
 ```
+
+
+
+`Subject<T>`
+
+- `Observable<T>`であり`Observer<T>`でもある
+- グローバルな`Subject<T>`があると...
+  - どこからでも変更を流せる
+  - どこからでも変更を購読できる
 
 
 
@@ -162,82 +197,17 @@ final class GlobalObservables {
 
 
 
-```swift
-class ItemViewModel {
-    let item: Variable<Item>()
-    let toggleLike: PublishSubject<Void>
-
-    func bind() {
-        toggleLike
-            .flatMap { /* Like APIを呼んでObservable<Item>を返す */ }
-            .bindTo(GlobalObservables.likedItem)
-            .addDisposableTo(disposeBag)
-
-        GlobalObservables.likedItem
-            .withLatestFrom(item) { $0 }
-            .filter { $0.id == $1.id }
-            .bindTo(item)
-            .addDisposableTo(disposeBag)
-    }
-}
-```
-
-
-
-### 実際はもうちょっと複雑
-
-- ボタン押した直後に反映する
-- 失敗したら元に戻す
-
-
-
-```swift
-class ItemTableViewCell: UITableViewCell {
-    let likeButton: UIButton
-    let viewModel: ItemViewModel
-    private var item: Item {
-        didSet { ... }
-    }
-
-    func bind() {
-        likeButton.rx_tap.asDriver().map { _ in () }
-            .drive(viewModel.toggleLike)
-            .addDisposableTo(disposeBag)
-
-        viewModel.item.asDriver()
-            .drive(item)
-            .addDisposableTo(disposeBag)
-    }
-}
-```
-
-
-
-```swift
-class ItemCollectionViewCell: UICollectionView {
-    let likeButton: UIButton
-    let viewModel: ItemViewModel
-    private var item: Item {
-        didSet { ... }
-    }
-
-    func bind() {
-        likeButton.rx_tap.asDriver().map { _ in () }
-            .drive(viewModel.toggleLike)
-            .addDisposableTo(disposeBag)
-
-        viewModel.item.asDriver()
-            .drive(item)
-            .addDisposableTo(disposeBag)
-    }
-}
-```
-
-
-
-### 小まとめ
+### 画面間の変更の共有
 
 - 変更はグローバルな`Observable<T>`で通知
 - 値の送信も購読もViewModelが担当する
 - Viewは画面間の同期について考える必要がない
   - バインドしてれば自動的に同期される
+
+
+
+# まとめ
+
+- 変更されやすい箇所と変更されにくい箇所がわかれる
+- 変更されやすい箇所の実装コストは低い
+- 実装コストが高いところは変更されにくい
