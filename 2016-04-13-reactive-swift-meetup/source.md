@@ -152,7 +152,7 @@ class TweetView: UIView {
 
 ```swift
 final class GlobalObservables {
-    static let likedItem = PublishSubject<Item>()
+    static let likedTweet = PublishSubject<Tweet>()
 }
 ```
 
@@ -191,23 +191,29 @@ final class GlobalObservables {
 
 
 
-- `Observable<Item>`に値を流すのはViewModel
-- `Observable<Item>`を購読するのもViewModel
-- ViewにはViewModelの値をバインドするだけ
-
-
-
-### 画面間の変更の共有
-
 - 変更はグローバルな`Observable<T>`で通知
 - 値の送信も購読もViewModelが担当する
-- Viewは画面間の同期について考える必要がない
+- ViewにはViewModelの値をバインドするだけ
+  - Viewは画面間の同期について考える必要がない
   - バインドしてれば自動的に同期される
 
 
 
-# まとめ
+<img src="./img/GlobalObservable1.png" height="500" style="background:none; border:none; box-shadow:none;">
 
-- 変更されやすい箇所と変更されにくい箇所がわかれる
-- 変更されやすい箇所の実装コストは低い
-- 実装コストが高いところは変更されにくい
+
+
+## まとめ
+
+
+
+- MVVMのレイヤーの切り分けは良い感じ
+- 変更の反映が自動的に行われる
+- グローバルな変更も同様に接続できる
+
+&nbsp;
+
+## その結果...
+
+- 変更されやすい箇所の実装コストを下げられる
+- 実装コストが高いところは変更されにくくなる
