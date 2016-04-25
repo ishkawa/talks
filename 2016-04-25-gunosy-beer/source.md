@@ -19,7 +19,7 @@ remote procedure call (RPC) protocol.
 
 
 
-- HTTP bodyのJSONでリクエスト記述する
+- HTTP bodyのJSONでリクエストを記述する
 - 1回の通信で複数のリクエストを実行できる
 
 
@@ -28,7 +28,7 @@ remote procedure call (RPC) protocol.
 
 
 
-画像
+<img src="./img/atte.png" height="600" style="background:none; border:none; box-shadow:none;">
 
 
 
@@ -50,7 +50,7 @@ remote procedure call (RPC) protocol.
 
 
 
-- 個々のRPCメソッドとして定義
+- 個々の処理をメソッドとして定義
 - クライアント側で1つのリクエストにまとめる
 - 情報の組み合わせの変更に強い
 
@@ -93,6 +93,10 @@ remote procedure call (RPC) protocol.
     }
 ]
 ```
+
+
+
+<img src="./img/atte.png" height="600" style="background:none; border:none; box-shadow:none;">
 
 
 
@@ -172,7 +176,7 @@ extension Session {
 
 
 
-タイムラインの画像
+<img src="./img/atte.png" height="600" style="background:none; border:none; box-shadow:none;">
 
 
 
