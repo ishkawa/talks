@@ -9,7 +9,10 @@ Note:
 <img src="./img/profile.png" height="500">
 
 Note:
-- この人ですね。
+- はじめに自己紹介をします。
+- この人です。
+- APIKitというネットワーキングライブラリを作っています。
+- 普段はメルカリの新規事業チームでiOSエンジニアをやっています。
 
 
 
@@ -28,7 +31,7 @@ let request = PostTweetRequest(text: "Hello, World.")
 Session.sendRequest(request) { result in
     switch result {
     case .Success(let tweet /* is Tweet */):
-        ...
+        print("\(tweet.screenName): \(tweet.text)")
 
     case .Failure(let error):
         ...
@@ -37,9 +40,11 @@ Session.sendRequest(request) { result in
 ```
 
 Note:
-- 例えば、ツイートを投稿するリクエストを投げれば、レスポンスの型は投稿されたツイートのモデルになるということです。
+- これがどういうことか例を使って説明しますと言いますと、
+- 例えば、ツイートを投稿するリクエストを投げれば、  レスポンスの型は投稿されたツイートのモデルになるということです。
 - このクロージャのSuccessの中のtweetっていうところですね。
 - ここが生のJSONではなくて、モデルになるということがポイントです。
+- レスポンスはモデルの型になっているので、screenNameやtextといったプロパティにもアクセスできるというわけですね。
 
 
 
@@ -82,6 +87,10 @@ class Session {
 
 Note:
 - この仕組みはprotocolのassociatedtypeと、そのプロトコルを型制約に持つジェネリックメソッドで実現されています。
+- RequestTypeというリクエストを表すためのプロトコルを用意しておいて、そこにassociatedtypeとしてResponseを持たせます。
+- そして、sendRequestというジェネリックメソッドの型パラメーターの制約にRequestTypeを設定して、
+  ハンドラでそのassociatedtypeのResponseの値を返すというわけです。
+- こうして、リクエストの型に応じてレスポンスの型を変えるということを実現しています。
 
 
 
