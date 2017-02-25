@@ -18,7 +18,7 @@ Note:
 
 
 
-<img src="./img/form.png">
+<img src="./img/form.png" height=600>
 
 Note:
 - こちらの画像のようなものですね。
@@ -53,7 +53,7 @@ Note:
 
 
 
-<img src="./img/form.png">
+<img src="./img/form.png" height=600>
 
 Note:
 - この例の1つ目のフィールドを見ても、それぞれの名前・値・バリデーションの仕様を持っていることは明らかですよね。
@@ -77,7 +77,7 @@ Note:
 
 
 
-<img src="./img/form.png">
+<img src="./img/form.png" height=600>
 
 Note:
 - 1つ目と2つ目のフィールドの値はString型で済みそうですが、
@@ -108,7 +108,7 @@ Note:
 
 
 
-<img src="./img/form.png">
+<img src="./img/form.png" height=600>
 
 Note:
 - これで名前と値については大丈夫でしょうか。
@@ -167,7 +167,7 @@ Note:
 
 
 
-<img src="./img/form.png">
+<img src="./img/form.png" height=600>
 
 Note:
 - フォームを見ながらどういうことか説明します。
@@ -210,7 +210,7 @@ Note:
 
 
 
-<img src="./img/form.png">
+<img src="./img/form.png" height=600>
 
 Note:
 - 続いて、もう1種類のフィールドも見てみましょう。
@@ -250,9 +250,10 @@ Note:
 
 
 ```swift
+let prefecture = Prefecture(id: 13, name: "東京都")
 let selectionFormField = SelectionFormField(
     name: 都道府県,
-    value: "東京都")
+    value: prefecture)
 
 try selectionFormField.validate()
 
@@ -301,9 +302,10 @@ Note:
 
 
 ```swift
+let prefecture = Prefecture(id: 13, name: "東京都")
 let selectionFormField = SelectionFormField(
     name: 都道府県,
-    value: "東京都")
+    value: prefecture)
 
 try selectionFormField.validate()
 
@@ -364,9 +366,10 @@ Note:
 
 
 ```swift
+let prefecture = Prefecture(id: 13, name: "東京都")
 let selectionFormField = SelectionFormField(
     name: 都道府県,
-    value: "東京都")
+    value: prefecture)
 
 let product = try selectionFormField.buildProduct()
 ```
@@ -393,7 +396,7 @@ Note:
 
 
 
-<img src="./img/form.png">
+<img src="./img/form.png" height=600>
 
 Note:
 - この例では、名前・Eメール・都道府県という3つのフィールドの結果をまとめるのが
@@ -540,7 +543,7 @@ Note:
 
 
 
-<video loop data-autoplay src="./img/validation.mov"></video>
+<video loop data-autoplay src="./img/validation.mov" height=600></video>
 
 Note:
 - 「どのフィールドが失敗したのか」という情報は例えばこんなUIに使います。
