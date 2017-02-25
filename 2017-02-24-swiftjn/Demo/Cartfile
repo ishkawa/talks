@@ -1,0 +1,4 @@
+github "antitypical/Result" ~> 3.1.0
+github "thoughtbot/Runes" ~> 4.0.1
+github "thoughtbot/Curry" ~> 3.0.0
+
